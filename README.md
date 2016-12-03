@@ -1,3 +1,3 @@
-K-Means KMeans
+K-Means Clustering
 
 Java implementation
