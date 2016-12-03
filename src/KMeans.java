@@ -3,10 +3,7 @@ import models.Data;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.jar.Pack200;
 
@@ -89,27 +86,66 @@ public class KMeans {
             return;
         }
 
+        HashMap<String, ArrayList<Data>> clusterMap = new HashMap<>();
         // Randomly plot centroids
         for(int i = 0; i < clusters; i++) {
             double x = ThreadLocalRandom.current().nextDouble(xMin, xMax);
             double y = ThreadLocalRandom.current().nextDouble(yMin, yMax);
-            centroids.add(new Centroid(x, y, "Cluster " + (i + 1)));
+            String id = "Cluster " + (i + 1);
+            centroids.add(new Centroid(x, y, id));
+            clusterMap.put(id, new ArrayList<>());
         }
+
 
         // Determine first cluster assignments
         for( Data data : trainingSet ) {
-            print("=============");
             String classification = null;
             double minDist = Double.MAX_VALUE;
             for(Centroid centroid : centroids) {
                 double dist = data.distance(centroid);
-                printf("Distance for %s: %f\n", centroid.getIdentifier(), dist);
                 if(dist < minDist) {
                     minDist = dist;
                     classification = centroid.getIdentifier();
                 }
             }
             data.setClassification(classification);
+            clusterMap.get(classification).add(data);
+        }
+
+        int count = 0;
+        while(count < 100) {
+            // Recompute centroid placement
+            for(Centroid centroid : centroids) {
+                ArrayList<Data> cluster = clusterMap.get(centroid.getIdentifier());
+                double avgX = 0;
+                double avgY = 0;
+                for(Data data : cluster) {
+                    avgX += data.getX();
+                    avgY += data.getY();
+                }
+                avgX /= cluster.size();
+                avgY /= cluster.size();
+                centroid.x = avgX;
+                centroid.y = avgY;
+                clusterMap.put(centroid.getIdentifier(), new ArrayList<>());
+            }
+
+            // Recompute cluster assignments
+            for( Data data : trainingSet ) {
+                String classification = null;
+                double minDist = Double.MAX_VALUE;
+                for(Centroid centroid : centroids) {
+                    double dist = data.distance(centroid);
+                    if(dist < minDist) {
+                        minDist = dist;
+                        classification = centroid.getIdentifier();
+                    }
+                }
+                data.setClassification(classification);
+                clusterMap.get(classification).add(data);
+            }
+
+            count++;
         }
 
         printTrainingSet();
