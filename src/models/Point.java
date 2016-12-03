@@ -5,19 +5,19 @@ package models;
  */
 public class Point {
 
-    int x;
-    int y;
+    double x;
+    double y;
 
-    public Point(int x, int y) {
+    public Point(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
-    public int getX() {
+    public double getX() {
         return x;
     }
 
-    public int getY() {
+    public double getY() {
         return y;
     }
 
@@ -26,13 +26,13 @@ public class Point {
      * @param point Point
      */
     public double distance(Point point) {
-        int q1 = point.x;
-        int q2 = point.y;
-        int p1 = point.x;
-        int p2 = point.y;
+        double q1 = point.x;
+        double q2 = point.y;
+        double p1 = point.x;
+        double p2 = point.y;
 
-        int xDiff = (q1 - p1);
-        int yDiff = (q2 - p2);
+        double xDiff = (q1 - p1);
+        double yDiff = (q2 - p2);
         xDiff *= xDiff;
         yDiff *= yDiff;
 
