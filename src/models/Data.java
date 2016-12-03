@@ -7,7 +7,7 @@ public class Data extends Point {
 
     private String classification;
 
-    public Data(int x, int y) {
+    public Data(double x, double y) {
         super(x, y);
     }
 
@@ -17,5 +17,10 @@ public class Data extends Point {
 
     public String getClassification() {
         return classification;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("(%f, %f): %s", x, y, classification);
     }
 }

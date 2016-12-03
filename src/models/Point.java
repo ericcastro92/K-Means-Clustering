@@ -38,4 +38,9 @@ public class Point {
 
         return Math.sqrt( xDiff + yDiff );
     }
+
+    @Override
+    public String toString() {
+        return String.format("(%f, %f)", x, y);
+    }
 }

@@ -8,8 +8,13 @@ import java.util.Random;
 public class Centroid extends Point {
     private String identifier;
 
-    public Centroid(int x, int y, String identifier) {
+    public Centroid(double x, double y, String identifier) {
         super(x, y);
         this.identifier = identifier;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s @ (%f, %f)", identifier, x, y);
     }
 }
