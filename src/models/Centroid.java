@@ -13,6 +13,10 @@ public class Centroid extends Point {
         this.identifier = identifier;
     }
 
+    public String getIdentifier() {
+        return identifier;
+    }
+
     @Override
     public String toString() {
         return String.format("%s @ (%f, %f)", identifier, x, y);

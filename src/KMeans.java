@@ -1,10 +1,13 @@
+import models.Centroid;
 import models.Data;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.jar.Pack200;
 
 /**
@@ -12,10 +15,27 @@ import java.util.jar.Pack200;
  */
 public class KMeans {
 
+    // Flags
+    private boolean dataSetLoaded = false;
+
     private ArrayList<Data> trainingSet;
+    private ArrayList<Centroid> centroids;
+    private int clusters = 2; // Tries to find 2 clusters by default
+
+    private double xMin = Double.MAX_VALUE;
+    private double yMin = Double.MAX_VALUE;
+    private double xMax = Double.MIN_VALUE;
+    private double yMax = Double.MIN_VALUE;
+
 
     public KMeans() {
         trainingSet = new ArrayList<>();
+        centroids = new ArrayList<>();
+    }
+
+    public KMeans(int clusters) {
+        this();
+        this.clusters = clusters;
     }
 
     public void loadDataSet(String path) {
@@ -46,6 +66,13 @@ public class KMeans {
 
                 double x = Double.parseDouble(tuple[0]);
                 double y = Double.parseDouble(tuple[1]);
+
+                // Find X an Y range
+                xMin = x < xMin ? x : xMin;
+                yMin = y < yMin ? y : yMin;
+                xMax = x > xMax ? x : xMax;
+                yMax = y > yMax ? y : yMax;
+
                 trainingSet.add(new Data(x, y));
             } catch(Exception e) {
                 printf("Bad input at %d\n", index);
@@ -53,7 +80,40 @@ public class KMeans {
             }
         }
 
+        dataSetLoaded = true;
+    }
+
+    public void findClusters() {
+        if(!dataSetLoaded) {
+            print("Data set not yet loaded");
+            return;
+        }
+
+        // Randomly plot centroids
+        for(int i = 0; i < clusters; i++) {
+            double x = ThreadLocalRandom.current().nextDouble(xMin, xMax);
+            double y = ThreadLocalRandom.current().nextDouble(yMin, yMax);
+            centroids.add(new Centroid(x, y, "Cluster " + (i + 1)));
+        }
+
+        // Determine first cluster assignments
+        for( Data data : trainingSet ) {
+            print("=============");
+            String classification = null;
+            double minDist = Double.MAX_VALUE;
+            for(Centroid centroid : centroids) {
+                double dist = data.distance(centroid);
+                printf("Distance for %s: %f\n", centroid.getIdentifier(), dist);
+                if(dist < minDist) {
+                    minDist = dist;
+                    classification = centroid.getIdentifier();
+                }
+            }
+            data.setClassification(classification);
+        }
+
         printTrainingSet();
+        printCentroids();
     }
 
     /** -- Debugging Function -- **/
@@ -61,6 +121,12 @@ public class KMeans {
     public void printTrainingSet() {
         for(Data data : trainingSet) {
             print(data);
+        }
+    }
+
+    public void printCentroids() {
+        for(Centroid centroid : centroids ) {
+            print(centroid);
         }
     }
 
@@ -77,7 +143,8 @@ public class KMeans {
     /** -- MAIN FUNCTION -- **/
 
     public static void main(String[] args) {
-        KMeans kMeans = new KMeans();
+        KMeans kMeans = new KMeans(3);
         kMeans.loadDataSet("/Users/ercastro/K-Means-Clustering/src/dataset.km");
+        kMeans.findClusters();
     }
 }

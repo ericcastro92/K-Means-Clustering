@@ -26,8 +26,8 @@ public class Point {
      * @param point Point
      */
     public double distance(Point point) {
-        double q1 = point.x;
-        double q2 = point.y;
+        double q1 = x;
+        double q2 = y;
         double p1 = point.x;
         double p2 = point.y;
 
